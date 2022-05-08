@@ -14,6 +14,7 @@ message getUserResp {
   bool active = 4;
   string source = 5;
   string createdAt = 6;
+  int64 id = 7;
 }
 
 message createUserReq {
@@ -28,7 +29,17 @@ message createUserResp {
   bool ok = 1;
 }
 
+message getByPhoneReq {
+  string phone = 1;
+}
+
+message getByEmailReq {
+  string email = 1;
+}
+
 service User {
   rpc GetUser(getUserReq) returns(getUserResp);
   rpc CreateUser(createUserReq) returns(createUserResp);
+  rpc getUserByPhone(getByPhoneReq) returns(getUserResp);
+  rpc getUserByEmail(getByEmailReq) returns(getUserResp);
 }

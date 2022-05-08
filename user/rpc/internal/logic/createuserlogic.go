@@ -26,7 +26,6 @@ func NewCreateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Create
 
 func (l *CreateUserLogic) CreateUser(in *user.CreateUserReq) (*user.CreateUserResp, error) {
 	conn := sqlx.NewMysql(l.svcCtx.Config.DataSource)
-
 	userSql := `insert into user(name, phone, email, source) values (?, ?, ?, ?)`
 	identitySql := `insert into identity(id, password) values (?, ?)`
 	err := conn.Transact(func(session sqlx.Session) error {
@@ -39,8 +38,6 @@ func (l *CreateUserLogic) CreateUser(in *user.CreateUserReq) (*user.CreateUserRe
 		defer stmt2.Close()
 
 		res, err := stmt.Exec(in.Name, in.Phone, in.Email, in.Source)
-
-		//var res sql.Result
 		if err != nil {
 			logx.Errorf("insert user stmt exec: %s", err)
 			return err

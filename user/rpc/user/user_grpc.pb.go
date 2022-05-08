@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type UserClient interface {
 	GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserResp, error)
 	CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*CreateUserResp, error)
+	GetUserByPhone(ctx context.Context, in *GetByPhoneReq, opts ...grpc.CallOption) (*GetUserResp, error)
+	GetUserByEmail(ctx context.Context, in *GetByEmailReq, opts ...grpc.CallOption) (*GetUserResp, error)
 }
 
 type userClient struct {
@@ -52,12 +54,32 @@ func (c *userClient) CreateUser(ctx context.Context, in *CreateUserReq, opts ...
 	return out, nil
 }
 
+func (c *userClient) GetUserByPhone(ctx context.Context, in *GetByPhoneReq, opts ...grpc.CallOption) (*GetUserResp, error) {
+	out := new(GetUserResp)
+	err := c.cc.Invoke(ctx, "/add.User/getUserByPhone", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetUserByEmail(ctx context.Context, in *GetByEmailReq, opts ...grpc.CallOption) (*GetUserResp, error) {
+	out := new(GetUserResp)
+	err := c.cc.Invoke(ctx, "/add.User/getUserByEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
 type UserServer interface {
 	GetUser(context.Context, *GetUserReq) (*GetUserResp, error)
 	CreateUser(context.Context, *CreateUserReq) (*CreateUserResp, error)
+	GetUserByPhone(context.Context, *GetByPhoneReq) (*GetUserResp, error)
+	GetUserByEmail(context.Context, *GetByEmailReq) (*GetUserResp, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -70,6 +92,12 @@ func (UnimplementedUserServer) GetUser(context.Context, *GetUserReq) (*GetUserRe
 }
 func (UnimplementedUserServer) CreateUser(context.Context, *CreateUserReq) (*CreateUserResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (UnimplementedUserServer) GetUserByPhone(context.Context, *GetByPhoneReq) (*GetUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserByPhone not implemented")
+}
+func (UnimplementedUserServer) GetUserByEmail(context.Context, *GetByEmailReq) (*GetUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserByEmail not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -120,6 +148,42 @@ func _User_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetUserByPhone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByPhoneReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserByPhone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/add.User/getUserByPhone",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserByPhone(ctx, req.(*GetByPhoneReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetUserByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByEmailReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/add.User/getUserByEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserByEmail(ctx, req.(*GetByEmailReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +198,14 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateUser",
 			Handler:    _User_CreateUser_Handler,
+		},
+		{
+			MethodName: "getUserByPhone",
+			Handler:    _User_GetUserByPhone_Handler,
+		},
+		{
+			MethodName: "getUserByEmail",
+			Handler:    _User_GetUserByEmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

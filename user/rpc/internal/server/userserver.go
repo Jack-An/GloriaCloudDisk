@@ -31,3 +31,13 @@ func (s *UserServer) CreateUser(ctx context.Context, in *user.CreateUserReq) (*u
 	l := logic.NewCreateUserLogic(ctx, s.svcCtx)
 	return l.CreateUser(in)
 }
+
+func (s *UserServer) GetUserByPhone(ctx context.Context, in *user.GetByPhoneReq) (*user.GetUserResp, error) {
+	l := logic.NewGetUserByPhoneLogic(ctx, s.svcCtx)
+	return l.GetUserByPhone(in)
+}
+
+func (s *UserServer) GetUserByEmail(ctx context.Context, in *user.GetByEmailReq) (*user.GetUserResp, error) {
+	l := logic.NewGetUserByEmailLogic(ctx, s.svcCtx)
+	return l.GetUserByEmail(in)
+}

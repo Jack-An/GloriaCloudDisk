@@ -14,6 +14,8 @@ type (
 	User interface {
 		GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserResp, error)
 		CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*CreateUserResp, error)
+		GetUserByPhone(ctx context.Context, in *GetByPhoneReq, opts ...grpc.CallOption) (*GetUserResp, error)
+		GetUserByEmail(ctx context.Context, in *GetByEmailReq, opts ...grpc.CallOption) (*GetUserResp, error)
 	}
 
 	defaultUser struct {
@@ -35,4 +37,14 @@ func (m *defaultUser) GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.
 func (m *defaultUser) CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*CreateUserResp, error) {
 	client := NewUserClient(m.cli.Conn())
 	return client.CreateUser(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetUserByPhone(ctx context.Context, in *GetByPhoneReq, opts ...grpc.CallOption) (*GetUserResp, error) {
+	client := NewUserClient(m.cli.Conn())
+	return client.GetUserByPhone(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetUserByEmail(ctx context.Context, in *GetByEmailReq, opts ...grpc.CallOption) (*GetUserResp, error) {
+	client := NewUserClient(m.cli.Conn())
+	return client.GetUserByEmail(ctx, in, opts...)
 }

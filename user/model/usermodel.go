@@ -14,6 +14,8 @@ type (
 	// and implement the added methods in customUserModel.
 	UserModel interface {
 		userModel
+		FindOneByPhone(ctx context.Context, phone string) (*User, error)
+		FindOneByEmail(ctx context.Context, email string) (*User, error)
 	}
 
 	customUserModel struct {

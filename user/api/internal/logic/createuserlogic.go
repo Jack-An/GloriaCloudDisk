@@ -24,26 +24,60 @@ func NewCreateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Create
 	}
 }
 
+func makeExistsResp() *types.CreateUserResp {
+	res := &types.CreateUserResp{}
+	res.Code = 401
+	res.Err = "already exist user"
+	return res
+}
+
+func makeCreateParamsNotValidResp() *types.CreateUserResp {
+	res := &types.CreateUserResp{}
+	res.Code = 401
+	res.Err = "phone not email must have one"
+	return res
+}
+
 func (l *CreateUserLogic) CreateUser(req *types.CreateUserReq) (resp *types.CreateUserResp, err error) {
 
-	if len(req.Phone) == 0 && len(req.Email) == 0 {
-		res := &types.CreateUserResp{}
-		res.Code = 400
-		res.Err = "phone not email must have one"
-		return res, nil
+	switch req.Source {
+	case "Phone":
+		{
+			if len(req.Phone) == 0 {
+				return makeCreateParamsNotValidResp(), nil
+			}
+			res, _ := l.svcCtx.User.GetUserByPhone(l.ctx, &user.GetByPhoneReq{Phone: req.Phone})
+			if res.Id != 0 {
+				return makeExistsResp(), nil
+			}
+		}
+	case "Email":
+		{
+			if len(req.Email) == 0 {
+				return makeCreateParamsNotValidResp(), nil
+			}
+			res, _ := l.svcCtx.User.GetUserByEmail(l.ctx, &user.GetByEmailReq{Email: req.Email})
+			if res.Id != 0 {
+				return makeExistsResp(), nil
+			}
+		}
+	default:
+		return makeCreateParamsNotValidResp(), nil
+
 	}
 
-	_, err1 := l.svcCtx.User.CreateUser(l.ctx, &user.CreateUserReq{
+	_, errno := l.svcCtx.User.CreateUser(l.ctx, &user.CreateUserReq{
 		Password: req.Password,
 		Name:     req.Name,
 		Email:    req.Email,
 		Phone:    req.Phone,
 		Source:   req.Source})
 
-	if err1 != nil {
+	if errno != nil {
+		logx.Errorf("create user fail: %s", errno)
 		res := &types.CreateUserResp{}
 		res.Code = 500
-		res.Err = err1.Error()
+		res.Err = "create fail"
 		return res, nil
 	}
 

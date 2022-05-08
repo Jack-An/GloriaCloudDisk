@@ -30,7 +30,9 @@ func (l *GetUserLogic) GetUser(in *user.GetUserReq) (*user.GetUserResp, error) {
 		return nil, err
 	}
 
-	return &user.GetUserResp{Name: r.Name,
+	return &user.GetUserResp{
+		Id:        r.Id,
+		Name:      r.Name,
 		Email:     r.Email.String,
 		Phone:     r.Phone.String,
 		Active:    r.Active != 0,

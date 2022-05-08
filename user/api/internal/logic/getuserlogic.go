@@ -41,7 +41,14 @@ func (l *GetUserLogic) GetUser(req *types.GetUserReq) (resp *types.GetUserResp, 
 		res.Err = "not found"
 		return res, nil
 	}
-	res := &types.GetUserResp{Data: types.UserInfo{Name: r.Name, Email: r.Email, Phone: r.Phone, Active: r.Active, Source: r.Source, CreatedAt: r.CreatedAt}}
+	res := &types.GetUserResp{Data: types.UserInfo{
+		Id:        r.Id,
+		Name:      r.Name,
+		Email:     r.Email,
+		Phone:     r.Phone,
+		Active:    r.Active,
+		Source:    r.Source,
+		CreatedAt: r.CreatedAt}}
 	res.Code = 0
 	res.Err = ""
 	return res, nil
