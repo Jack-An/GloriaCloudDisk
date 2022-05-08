@@ -27,13 +27,6 @@ func NewLoginUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginUs
 	}
 }
 
-func makeLoginFailedResp(message string) *types.LoginResp {
-	resp := types.LoginResp{}
-	resp.Code = 1000
-	resp.Err = message
-	return &resp
-}
-
 func (l *LoginUserLogic) getJwtToken(secretKey string, iat, seconds, userId int64) (string, error) {
 	claims := make(jwt.MapClaims)
 	claims["exp"] = iat + seconds
@@ -42,23 +35,6 @@ func (l *LoginUserLogic) getJwtToken(secretKey string, iat, seconds, userId int6
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Claims = claims
 	return token.SignedString([]byte(secretKey))
-}
-
-func makeLoginSuccessResp(l *LoginUserLogic, userResp *user.GetUserResp) *types.LoginResp {
-	now := time.Now().Unix()
-	accessExpire := l.svcCtx.Config.Auth.AccessExpire
-	jwtToken, err := l.getJwtToken(l.svcCtx.Config.Auth.AccessSecret, now, l.svcCtx.Config.Auth.AccessExpire, userResp.Id)
-	if err != nil {
-		return makeLoginFailedResp("generate jwt token fail")
-	}
-	resp := types.LoginResp{Data: types.LoginClaims{
-		Id:           userResp.Id,
-		Name:         userResp.Name,
-		AccessToken:  jwtToken,
-		AccessExpire: accessExpire,
-		RefreshAfter: accessExpire / 2,
-	}}
-	return &resp
 }
 
 func (l *LoginUserLogic) LoginUser(req *types.LoginReq) (resp *types.LoginResp, err error) {
@@ -70,20 +46,32 @@ func (l *LoginUserLogic) LoginUser(req *types.LoginReq) (resp *types.LoginResp, 
 	} else if common.VerifyEmailFormat(req.Identity) {
 		res, errno = l.svcCtx.User.GetUserByEmail(l.ctx, &user.GetByEmailReq{Email: req.Identity})
 	} else {
-		return makeLoginFailedResp("identity not match phone or email"), nil
+		return nil, common.NewCodeError(common.NOT_FOUND, "identity not match phone or email")
 	}
 
 	if errno != nil {
-		return makeLoginFailedResp("user not found"), nil
+		return nil, common.NewCodeError(common.NOT_FOUND, "user not found")
 	}
 
 	verifyResult, errno := l.svcCtx.User.VerifyPassword(l.ctx, &user.VerifyReq{Id: res.Id, Password: req.Password})
 	if errno != nil {
-		return makeLoginFailedResp(errno.Error()), nil
+		return nil, common.NewCodeError(common.UNKNOWN, "verify fail")
 	}
 	if verifyResult.Ok {
-		return makeLoginSuccessResp(l, res), nil
+		now := time.Now().Unix()
+		accessExpire := l.svcCtx.Config.Auth.AccessExpire
+		jwtToken, err := l.getJwtToken(l.svcCtx.Config.Auth.AccessSecret, now, l.svcCtx.Config.Auth.AccessExpire, res.Id)
+		if err != nil {
+			return nil, common.NewCodeError(common.UNKNOWN, "generate token fail")
+		}
+		return &types.LoginResp{Data: types.LoginClaims{
+			Id:           res.Id,
+			Name:         res.Name,
+			AccessToken:  jwtToken,
+			AccessExpire: now + accessExpire,
+			RefreshAfter: now + accessExpire/2,
+		}}, nil
 	} else {
-		return makeLoginFailedResp("password is wrong"), nil
+		return nil, common.NewCodeError(common.INVALID_ARGUMENT, "password is wrong")
 	}
 }

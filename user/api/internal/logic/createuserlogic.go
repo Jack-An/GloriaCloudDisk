@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"GloriaCloudDisk/common"
 	"GloriaCloudDisk/user/rpc/user"
 	"context"
 
@@ -24,45 +25,31 @@ func NewCreateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Create
 	}
 }
 
-func makeExistsResp() *types.CreateUserResp {
-	res := &types.CreateUserResp{}
-	res.Code = 401
-	res.Err = "already exist user"
-	return res
-}
-
-func makeCreateParamsNotValidResp() *types.CreateUserResp {
-	res := &types.CreateUserResp{}
-	res.Code = 401
-	res.Err = "phone not email must have one"
-	return res
-}
-
 func (l *CreateUserLogic) CreateUser(req *types.CreateUserReq) (resp *types.CreateUserResp, err error) {
 
 	switch req.Source {
 	case "Phone":
 		{
 			if len(req.Phone) == 0 {
-				return makeCreateParamsNotValidResp(), nil
+				return nil, common.NewCodeError(common.INVALID_ARGUMENT, "Phone cannot be null")
 			}
 			res, _ := l.svcCtx.User.GetUserByPhone(l.ctx, &user.GetByPhoneReq{Phone: req.Phone})
 			if res.Id != 0 {
-				return makeExistsResp(), nil
+				return nil, common.NewCodeError(common.ALREADY_EXISTS, "already exist user")
 			}
 		}
 	case "Email":
 		{
 			if len(req.Email) == 0 {
-				return makeCreateParamsNotValidResp(), nil
+				return nil, common.NewCodeError(common.INVALID_ARGUMENT, "Email cannot be null")
 			}
 			res, _ := l.svcCtx.User.GetUserByEmail(l.ctx, &user.GetByEmailReq{Email: req.Email})
 			if res.Id != 0 {
-				return makeExistsResp(), nil
+				return nil, common.NewCodeError(common.ALREADY_EXISTS, "already exist user")
 			}
 		}
 	default:
-		return makeCreateParamsNotValidResp(), nil
+		return nil, common.NewCodeError(common.INVALID_ARGUMENT, "Only support Phone or Email")
 
 	}
 
@@ -75,10 +62,7 @@ func (l *CreateUserLogic) CreateUser(req *types.CreateUserReq) (resp *types.Crea
 
 	if errno != nil {
 		logx.Errorf("create user fail: %s", errno)
-		res := &types.CreateUserResp{}
-		res.Code = 500
-		res.Err = "create fail"
-		return res, nil
+		return nil, common.NewCodeError(common.UNKNOWN, "create fail")
 	}
 
 	return &types.CreateUserResp{}, nil

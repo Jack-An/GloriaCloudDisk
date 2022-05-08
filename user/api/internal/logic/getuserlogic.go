@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"GloriaCloudDisk/common"
 	"GloriaCloudDisk/user/rpc/user"
 	"context"
 	"strconv"
@@ -25,27 +26,20 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 	}
 }
 
-func makeGetUserFailedResp(message string) *types.GetUserResp {
-	res := &types.GetUserResp{}
-	res.Code = 1002
-	res.Err = message
-	return res
-}
-
 func (l *GetUserLogic) GetUser(req *types.GetUserReq) (resp *types.GetUserResp, err error) {
 	userId, err := strconv.Atoi(req.Id)
 	if err != nil {
-		return makeGetUserFailedResp("id not valid"), nil
+		return nil, common.NewCodeError(common.INVALID_ARGUMENT, "id not valid")
 	}
 
 	jwtTokenUserId := l.ctx.Value("userId")
 	if jwtTokenUserId != userId {
-		return makeGetUserFailedResp("unauthorized"), nil
+		return nil, common.NewCodeError(common.UNAUTHENTICATED, "unauthorized")
 	}
 
 	r, err := l.svcCtx.User.GetUser(l.ctx, &user.GetUserReq{Id: int64(userId)})
 	if err != nil {
-		return makeGetUserFailedResp("user not found"), nil
+		return nil, common.NewCodeError(common.NOT_FOUND, "user not found")
 	}
 	res := &types.GetUserResp{Data: types.UserInfo{
 		Id:        r.Id,
