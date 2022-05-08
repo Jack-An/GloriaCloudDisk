@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"GloriaCloudDisk/common"
 	"context"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 
@@ -26,6 +27,13 @@ func NewCreateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Create
 
 func (l *CreateUserLogic) CreateUser(in *user.CreateUserReq) (*user.CreateUserResp, error) {
 	conn := sqlx.NewMysql(l.svcCtx.Config.DataSource)
+	encrypt := common.CryptContext{Schema: l.svcCtx.Config.EncryptSchema}
+	password, errno := encrypt.Encrypt(in.Password)
+	if errno != nil {
+		logx.Errorf("encrypt password fail: %s", errno)
+		return &user.CreateUserResp{Ok: false}, errno
+	}
+
 	userSql := `insert into user(name, phone, email, source) values (?, ?, ?, ?)`
 	identitySql := `insert into identity(id, password) values (?, ?)`
 	err := conn.Transact(func(session sqlx.Session) error {
@@ -45,7 +53,7 @@ func (l *CreateUserLogic) CreateUser(in *user.CreateUserReq) (*user.CreateUserRe
 
 		userId, _ := res.LastInsertId()
 
-		if _, err := stmt2.Exec(userId, in.Password); err != nil {
+		if _, err := stmt2.Exec(userId, password); err != nil {
 			logx.Errorf("insert identity stmt exec: %s", err)
 			return err
 		}
