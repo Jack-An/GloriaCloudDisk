@@ -1,15 +1,34 @@
 syntax = "proto3";
 
-package stream;
+package add;
+option go_package = "./user";
 
-message StreamReq {
+message getUserReq {
+  int64 id = 1;
+}
+
+message getUserResp {
   string name = 1;
+  string email = 2;
+  string phone = 3;
+  bool active = 4;
+  string source = 5;
+  string createdAt = 6;
 }
 
-message StreamResp {
-  string greet = 1;
+message createUserReq {
+  string name = 1;
+  string email = 2;
+  string phone = 3;
+  string password = 4;
+  string source = 5;
 }
 
-service StreamGreeter {
-  rpc greet(StreamReq) returns (StreamResp);
+message createUserResp {
+  bool ok = 1;
+}
+
+service User {
+  rpc GetUser(getUserReq) returns(getUserResp);
+  rpc CreateUser(createUserReq) returns(createUserResp);
 }

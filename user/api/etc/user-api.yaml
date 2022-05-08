@@ -1,0 +1,10 @@
+Name: user-api
+Host: 127.0.0.1
+Port: 6600
+
+User:
+  Etcd:
+    Hosts:
+      - localhost:2379
+    Key: user.rpc
+
