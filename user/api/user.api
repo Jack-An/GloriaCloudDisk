@@ -1,56 +1,84 @@
 syntax = "v1"
 
 info(
-    title: "user"
-    desc: "user api"
-    author: "ancongcong"
-    email: "ancongcong@wisdomgarden.com"
+	title: "user"
+	desc: "user api"
+	author: "ancongcong"
+	email: "ancongcong@wisdomgarden.com"
 )
 
 type Resp {
-    Code int `json:"code"`
-    Err string `json:"err"`
+	Code int    `json:"code"`
+	Err  string `json:"err"`
 }
 
 type (
-    UserInfo {
-        Id int64 `json:"id"`
-        Name string `json:"name"`
-        Email string `json:"email"`
-        Phone string `json:"phone"`
-        Active bool `json:"active"`
-        Source string `json:"source"`
-        CreatedAt string `json:"createdAt"`
-    }
-    GetUserResp {
-        Data UserInfo `json:"data"`
-        Resp
-    }
+	UserInfo {
+		Id        int64  `json:"id"`
+		Name      string `json:"name"`
+		Email     string `json:"email"`
+		Phone     string `json:"phone"`
+		Active    bool   `json:"active"`
+		Source    string `json:"source"`
+		CreatedAt string `json:"createdAt"`
+	}
+	GetUserResp {
+		Data UserInfo `json:"data"`
+		Resp
+	}
 
-    GetUserReq {
-        Id string `path:"userId"`
-    }
+	GetUserReq {
+		Id string `path:"userId"`
+	}
 )
 
 type (
-    CreateUserReq {
-        Name string `json:"name"`
-        Email string `json:"email"`
-        Phone string `json:"phone"`
-        Password string `json:"password"`
-        Source string `json:"source"`
-    }
+	CreateUserReq {
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Phone    string `json:"phone"`
+		Password string `json:"password"`
+		Source   string `json:"source"`
+	}
 
-    CreateUserResp {
-        Data string `json:"data"`
-        Resp
-    }
+	CreateUserResp {
+		Data string `json:"data"`
+		Resp
+	}
 )
 
-service user-api {
-    @handler GetUser
-    get /users/:userId (GetUserReq) returns (GetUserResp)
+type (
+	LoginReq {
+		Identity string `json:"identity"`
+		Password string `json:"password"`
+	}
 
-    @handler CreateUser
-    post /users/create (CreateUserReq) returns (CreateUserResp)
+	LoginClaims {
+		Id           int64  `json:"id"`
+		Name         string `json:"name"`
+		AccessToken  string `json:"accessToken"`
+		AccessExpire int64  `json:"accessExpire"`
+		RefreshAfter int64  `json:"refreshAfter"`
+	}
+
+	LoginResp {
+		Data LoginClaims `json:"data"`
+		Resp
+	}
+)
+
+@server(
+	jwt: Auth
+)
+service user-api {
+	@handler GetUser
+	get /users/:userId (GetUserReq) returns (GetUserResp)
+}
+
+service user-api {
+	@handler CreateUser
+	post /users/create (CreateUserReq) returns (CreateUserResp)
+	
+	@handler LoginUser
+	post /user/login (LoginReq) returns (LoginResp)
 }

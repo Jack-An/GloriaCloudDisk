@@ -37,3 +37,21 @@ type CreateUserResp struct {
 	Data string `json:"data"`
 	Resp
 }
+
+type LoginReq struct {
+	Identity string `json:"identity"`
+	Password string `json:"password"`
+}
+
+type LoginClaims struct {
+	Id           int64  `json:"id"`
+	Name         string `json:"name"`
+	AccessToken  string `json:"accessToken"`
+	AccessExpire int64  `json:"accessExpire"`
+	RefreshAfter int64  `json:"refreshAfter"`
+}
+
+type LoginResp struct {
+	Data LoginClaims `json:"data"`
+	Resp
+}

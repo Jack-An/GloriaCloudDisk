@@ -16,6 +16,7 @@ type (
 		CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*CreateUserResp, error)
 		GetUserByPhone(ctx context.Context, in *GetByPhoneReq, opts ...grpc.CallOption) (*GetUserResp, error)
 		GetUserByEmail(ctx context.Context, in *GetByEmailReq, opts ...grpc.CallOption) (*GetUserResp, error)
+		VerifyPassword(ctx context.Context, in *VerifyReq, opts ...grpc.CallOption) (*VerifyResp, error)
 	}
 
 	defaultUser struct {
@@ -47,4 +48,9 @@ func (m *defaultUser) GetUserByPhone(ctx context.Context, in *GetByPhoneReq, opt
 func (m *defaultUser) GetUserByEmail(ctx context.Context, in *GetByEmailReq, opts ...grpc.CallOption) (*GetUserResp, error) {
 	client := NewUserClient(m.cli.Conn())
 	return client.GetUserByEmail(ctx, in, opts...)
+}
+
+func (m *defaultUser) VerifyPassword(ctx context.Context, in *VerifyReq, opts ...grpc.CallOption) (*VerifyResp, error) {
+	client := NewUserClient(m.cli.Conn())
+	return client.VerifyPassword(ctx, in, opts...)
 }

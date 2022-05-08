@@ -25,21 +25,27 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 	}
 }
 
+func makeGetUserFailedResp(message string) *types.GetUserResp {
+	res := &types.GetUserResp{}
+	res.Code = 1002
+	res.Err = message
+	return res
+}
+
 func (l *GetUserLogic) GetUser(req *types.GetUserReq) (resp *types.GetUserResp, err error) {
-	// todo: add your logic here and delete this line
 	userId, err := strconv.Atoi(req.Id)
 	if err != nil {
-		res := &types.GetUserResp{}
-		res.Code = 400
-		res.Err = "id not valid"
-		return res, nil
+		return makeGetUserFailedResp("id not valid"), nil
 	}
+
+	jwtTokenUserId := l.ctx.Value("userId")
+	if jwtTokenUserId != userId {
+		return makeGetUserFailedResp("unauthorized"), nil
+	}
+
 	r, err := l.svcCtx.User.GetUser(l.ctx, &user.GetUserReq{Id: int64(userId)})
 	if err != nil {
-		res := &types.GetUserResp{}
-		res.Code = 404
-		res.Err = "not found"
-		return res, nil
+		return makeGetUserFailedResp("user not found"), nil
 	}
 	res := &types.GetUserResp{Data: types.UserInfo{
 		Id:        r.Id,
@@ -49,7 +55,5 @@ func (l *GetUserLogic) GetUser(req *types.GetUserReq) (resp *types.GetUserResp, 
 		Active:    r.Active,
 		Source:    r.Source,
 		CreatedAt: r.CreatedAt}}
-	res.Code = 0
-	res.Err = ""
 	return res, nil
 }

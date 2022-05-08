@@ -41,3 +41,8 @@ func (s *UserServer) GetUserByEmail(ctx context.Context, in *user.GetByEmailReq)
 	l := logic.NewGetUserByEmailLogic(ctx, s.svcCtx)
 	return l.GetUserByEmail(in)
 }
+
+func (s *UserServer) VerifyPassword(ctx context.Context, in *user.VerifyReq) (*user.VerifyResp, error) {
+	l := logic.NewVerifyPasswordLogic(ctx, s.svcCtx)
+	return l.VerifyPassword(in)
+}

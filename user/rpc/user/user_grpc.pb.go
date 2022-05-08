@@ -26,6 +26,7 @@ type UserClient interface {
 	CreateUser(ctx context.Context, in *CreateUserReq, opts ...grpc.CallOption) (*CreateUserResp, error)
 	GetUserByPhone(ctx context.Context, in *GetByPhoneReq, opts ...grpc.CallOption) (*GetUserResp, error)
 	GetUserByEmail(ctx context.Context, in *GetByEmailReq, opts ...grpc.CallOption) (*GetUserResp, error)
+	VerifyPassword(ctx context.Context, in *VerifyReq, opts ...grpc.CallOption) (*VerifyResp, error)
 }
 
 type userClient struct {
@@ -72,6 +73,15 @@ func (c *userClient) GetUserByEmail(ctx context.Context, in *GetByEmailReq, opts
 	return out, nil
 }
 
+func (c *userClient) VerifyPassword(ctx context.Context, in *VerifyReq, opts ...grpc.CallOption) (*VerifyResp, error) {
+	out := new(VerifyResp)
+	err := c.cc.Invoke(ctx, "/add.User/verifyPassword", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type UserServer interface {
 	CreateUser(context.Context, *CreateUserReq) (*CreateUserResp, error)
 	GetUserByPhone(context.Context, *GetByPhoneReq) (*GetUserResp, error)
 	GetUserByEmail(context.Context, *GetByEmailReq) (*GetUserResp, error)
+	VerifyPassword(context.Context, *VerifyReq) (*VerifyResp, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -98,6 +109,9 @@ func (UnimplementedUserServer) GetUserByPhone(context.Context, *GetByPhoneReq) (
 }
 func (UnimplementedUserServer) GetUserByEmail(context.Context, *GetByEmailReq) (*GetUserResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByEmail not implemented")
+}
+func (UnimplementedUserServer) VerifyPassword(context.Context, *VerifyReq) (*VerifyResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyPassword not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -184,6 +198,24 @@ func _User_GetUserByEmail_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_VerifyPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).VerifyPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/add.User/verifyPassword",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).VerifyPassword(ctx, req.(*VerifyReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +238,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "getUserByEmail",
 			Handler:    _User_GetUserByEmail_Handler,
+		},
+		{
+			MethodName: "verifyPassword",
+			Handler:    _User_VerifyPassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

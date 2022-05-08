@@ -8,3 +8,6 @@ User:
       - localhost:2379
     Key: user.rpc
 
+Auth:
+  AccessSecret: "some-secret-jwt-token"
+  AccessExpire: 3600

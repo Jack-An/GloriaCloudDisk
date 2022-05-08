@@ -37,9 +37,20 @@ message getByEmailReq {
   string email = 1;
 }
 
+message verifyReq {
+  int64 Id = 1;
+  string password = 2;
+}
+
+message verifyResp{
+  bool ok = 1;
+}
+
+
 service User {
   rpc GetUser(getUserReq) returns(getUserResp);
   rpc CreateUser(createUserReq) returns(createUserResp);
   rpc getUserByPhone(getByPhoneReq) returns(getUserResp);
   rpc getUserByEmail(getByEmailReq) returns(getUserResp);
+  rpc verifyPassword(verifyReq) returns(verifyResp);
 }
