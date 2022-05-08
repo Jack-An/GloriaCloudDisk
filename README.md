@@ -9,6 +9,15 @@
     -- 项目开始   2022.5.8
 
 
+### Before Dev
+
+```bash
+    CREATE DATABASE net_disk_dev CHARACTER SET UTF8;  # for dev 
+    CREATE DATABASE net_disk_test CHARACTER SET UTF8;  # for unit test (not yet)
+
+```
+
+
 ## 后端模块（暂时想到的） 
 
 ### user rpc
