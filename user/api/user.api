@@ -1,56 +1,55 @@
 syntax = "v1"
 
-info (
-	title: "user"
-	desc: "user api"
-	author: "ancongcong"
-	email: "ancongcong@wisdomgarden.com"
+info(
+    title: "user"
+    desc: "user api"
+    author: "ancongcong"
+    email: "ancongcong@wisdomgarden.com"
 )
 
 type Resp {
-	Code int    `json:"code"`
-	Err  string `json:"err"`
+    Code int `json:"code"`
+    Err string `json:"err"`
 }
 
 type (
-	UserInfo {
-		Name      string `json:"name"`
-		Email     string `json:"email"`
-		Phone     string `json:"phone"`
-		Active    bool   `json:"active"`
-		Source    string `json:"source"`
-		CreatedAt string `json:"createdAt"`
-	}
-	GetUserResp {
-		Data UserInfo `json:"data"`
-		Resp
-	}
+    UserInfo {
+        Name string `json:"name"`
+        Email string `json:"email"`
+        Phone string `json:"phone"`
+        Active bool `json:"active"`
+        Source string `json:"source"`
+        CreatedAt string `json:"createdAt"`
+    }
+    GetUserResp {
+        Data UserInfo `json:"data"`
+        Resp
+    }
 
-	GetUserReq {
-		Id string `path:"userId"`
-	}
+    GetUserReq {
+        Id string `path:"userId"`
+    }
 )
 
 type (
-	CreateUserReq {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Phone    string `json:"phone"`
-		Password string `json:"password"`
-		Source   string `json:"source"`
-	}
+    CreateUserReq {
+        Name string `json:"name"`
+        Email string `json:"email"`
+        Phone string `json:"phone"`
+        Password string `json:"password"`
+        Source string `json:"source"`
+    }
 
-	CreateUserResp {
-		Data string `json:"data"`
-		Resp
-	}
+    CreateUserResp {
+        Data string `json:"data"`
+        Resp
+    }
 )
 
 service user-api {
-	@handler GetUser
-	get /users/:userId(GetUserReq) returns(GetUserResp)
-	
-	@handler CreateUser
-	post /users/create(CreateUserReq) returns(CreateUserResp)
-	
+    @handler GetUser
+    get /users/:userId (GetUserReq) returns (GetUserResp)
+
+    @handler CreateUser
+    post /users/create (CreateUserReq) returns (CreateUserResp)
 }

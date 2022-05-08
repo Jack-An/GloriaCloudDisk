@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 
 	"GloriaCloudDisk/user/rpc/internal/svc"
 	"GloriaCloudDisk/user/rpc/user"
@@ -24,7 +25,39 @@ func NewCreateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Create
 }
 
 func (l *CreateUserLogic) CreateUser(in *user.CreateUserReq) (*user.CreateUserResp, error) {
-	// todo: add your logic here and delete this line
+	conn := sqlx.NewMysql(l.svcCtx.Config.DataSource)
 
-	return &user.CreateUserResp{}, nil
+	userSql := `insert into user(name, phone, email, source) values (?, ?, ?, ?)`
+	identitySql := `insert into identity(id, password) values (?, ?)`
+	err := conn.Transact(func(session sqlx.Session) error {
+		stmt, err := conn.Prepare(userSql)
+		stmt2, err2 := conn.Prepare(identitySql)
+		if err != nil || err2 != nil {
+			return err
+		}
+		defer stmt.Close()
+		defer stmt2.Close()
+
+		res, err := stmt.Exec(in.Name, in.Phone, in.Email, in.Source)
+
+		//var res sql.Result
+		if err != nil {
+			logx.Errorf("insert user stmt exec: %s", err)
+			return err
+		}
+
+		userId, _ := res.LastInsertId()
+
+		if _, err := stmt2.Exec(userId, in.Password); err != nil {
+			logx.Errorf("insert identity stmt exec: %s", err)
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return &user.CreateUserResp{Ok: false}, err
+	}
+	return &user.CreateUserResp{Ok: true}, nil
 }
