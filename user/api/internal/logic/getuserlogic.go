@@ -34,12 +34,12 @@ func (l *GetUserLogic) GetUser(req *types.GetUserReq) (resp *types.GetUserResp, 
 
 	jwtTokenUserId := l.ctx.Value("userId")
 	if jwtTokenUserId != userId {
-		return nil, common.NewCodeError(common.UNAUTHENTICATED, "unauthorized")
+		return nil, common.NewDefaultMgsError(common.PERMISSION_DENIED)
 	}
 
 	r, err := l.svcCtx.User.GetUser(l.ctx, &user.GetUserReq{Id: int64(userId)})
 	if err != nil {
-		return nil, common.NewCodeError(common.NOT_FOUND, "user not found")
+		return nil, common.NewDefaultMgsError(common.NOT_FOUND)
 	}
 	res := &types.GetUserResp{Data: types.UserInfo{
 		Id:        r.Id,

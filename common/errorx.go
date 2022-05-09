@@ -14,8 +14,8 @@ func NewCodeError(code int, err string) error {
 	return &CodeError{Code: code, Err: err}
 }
 
-func NewDefaultError(err string) error {
-	return NewCodeError(UNKNOWN, err)
+func NewDefaultMgsError(code int) error {
+	return &CodeError{Code: code, Err: ResponseStdText[code]}
 }
 
 func (e *CodeError) Error() string {

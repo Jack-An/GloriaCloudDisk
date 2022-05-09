@@ -46,15 +46,16 @@ func (l *LoginUserLogic) LoginUser(req *types.LoginReq) (resp *types.LoginResp, 
 	} else if common.VerifyEmailFormat(req.Identity) {
 		res, errno = l.svcCtx.User.GetUserByEmail(l.ctx, &user.GetByEmailReq{Email: req.Identity})
 	} else {
-		return nil, common.NewCodeError(common.NOT_FOUND, "identity not match phone or email")
+		return nil, common.NewCodeError(common.INVALID_ARGUMENT, "identity not match phone or email")
 	}
 
 	if errno != nil {
-		return nil, common.NewCodeError(common.NOT_FOUND, "user not found")
+		return nil, common.NewDefaultMgsError(common.NOT_FOUND)
 	}
 
 	verifyResult, errno := l.svcCtx.User.VerifyPassword(l.ctx, &user.VerifyReq{Id: res.Id, Password: req.Password})
 	if errno != nil {
+		logx.Errorf("verify fail: %s", err)
 		return nil, common.NewCodeError(common.UNKNOWN, "verify fail")
 	}
 	if verifyResult.Ok {

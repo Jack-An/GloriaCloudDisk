@@ -27,7 +27,7 @@ func main() {
 	server := rest.MustNewServer(c.RestConf, rest.WithUnauthorizedCallback(func(w http.ResponseWriter, r *http.Request, err error) {
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(common.NewCodeError(common.UNAUTHENTICATED, "unauthorized"))
+		json.NewEncoder(w).Encode(common.NewDefaultMgsError(common.UNAUTHENTICATED))
 	}))
 	defer server.Stop()
 
@@ -38,7 +38,7 @@ func main() {
 		case *common.CodeError:
 			return http.StatusOK, e.Data()
 		default:
-			return http.StatusOK, common.NewDefaultError("unknown")
+			return http.StatusOK, common.NewDefaultMgsError(common.UNKNOWN)
 		}
 	})
 

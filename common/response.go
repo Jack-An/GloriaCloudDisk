@@ -152,3 +152,23 @@ const (
 	// HTTP Mapping: 500 Internal Server Error
 	DATA_LOSS = 15
 )
+
+var ResponseStdText = map[int]string{
+	OK:                  "ok",
+	CANCELLED:           "cancelled",
+	UNKNOWN:             "unknown",
+	INVALID_ARGUMENT:    "invalid argument",
+	DEADLINE_EXCEEDED:   "deadline exceeded",
+	NOT_FOUND:           "not found",
+	ALREADY_EXISTS:      "already exists",
+	PERMISSION_DENIED:   "permission denied",
+	UNAUTHENTICATED:     "unauthorized",
+	RESOURCE_EXHAUSTED:  "resource exhausted",
+	FAILED_PRECONDITION: "fail recondition",
+	ABORTED:             "abort",
+	OUT_OF_RANGE:        "out of range",
+	UNIMPLEMENTED:       "unimplemented",
+	INTERNAL:            "internal",
+	UNAVAILABLE:         "unavailable",
+	DATA_LOSS:           "data loss",
+}

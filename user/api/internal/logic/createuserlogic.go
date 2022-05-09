@@ -35,7 +35,7 @@ func (l *CreateUserLogic) CreateUser(req *types.CreateUserReq) (resp *types.Crea
 			}
 			res, _ := l.svcCtx.User.GetUserByPhone(l.ctx, &user.GetByPhoneReq{Phone: req.Phone})
 			if res.Id != 0 {
-				return nil, common.NewCodeError(common.ALREADY_EXISTS, "already exist user")
+				return nil, common.NewDefaultMgsError(common.ALREADY_EXISTS)
 			}
 		}
 	case "Email":
@@ -45,7 +45,7 @@ func (l *CreateUserLogic) CreateUser(req *types.CreateUserReq) (resp *types.Crea
 			}
 			res, _ := l.svcCtx.User.GetUserByEmail(l.ctx, &user.GetByEmailReq{Email: req.Email})
 			if res.Id != 0 {
-				return nil, common.NewCodeError(common.ALREADY_EXISTS, "already exist user")
+				return nil, common.NewDefaultMgsError(common.ALREADY_EXISTS)
 			}
 		}
 	default:
@@ -62,7 +62,7 @@ func (l *CreateUserLogic) CreateUser(req *types.CreateUserReq) (resp *types.Crea
 
 	if errno != nil {
 		logx.Errorf("create user fail: %s", errno)
-		return nil, common.NewCodeError(common.UNKNOWN, "create fail")
+		return nil, common.NewDefaultMgsError(common.UNKNOWN)
 	}
 
 	return &types.CreateUserResp{}, nil
