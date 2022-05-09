@@ -5,6 +5,7 @@ import (
 	"GloriaCloudDisk/user/api/internal/config"
 	"GloriaCloudDisk/user/api/internal/handler"
 	"GloriaCloudDisk/user/api/internal/svc"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -23,7 +24,11 @@ func main() {
 	conf.MustLoad(*configFile, &c)
 
 	ctx := svc.NewServiceContext(c)
-	server := rest.MustNewServer(c.RestConf)
+	server := rest.MustNewServer(c.RestConf, rest.WithUnauthorizedCallback(func(w http.ResponseWriter, r *http.Request, err error) {
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(common.NewCodeError(common.UNAUTHENTICATED, "unauthorized"))
+	}))
 	defer server.Stop()
 
 	handler.RegisterHandlers(server, ctx)
