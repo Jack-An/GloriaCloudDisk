@@ -4,3 +4,9 @@ Etcd:
   Hosts:
   - 127.0.0.1:2379
   Key: verify.rpc
+
+Email:
+  Stmt: smtp.qq.com
+  Port: 465
+  Username: 1029841651@qq.com
+  Password: test
