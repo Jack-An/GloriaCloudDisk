@@ -26,7 +26,10 @@ func NewCreateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Create
 }
 
 func (l *CreateUserLogic) CreateUser(req *types.CreateUserReq) (resp *types.CreateUserResp, err error) {
-
+	err = l.svcCtx.Redis.SetexCtx(l.ctx, "test", "value", 60)
+	if err != nil {
+		return nil, common.NewCodeError(common.UNKNOWN, err.Error())
+	}
 	switch req.Source {
 	case "Phone":
 		{

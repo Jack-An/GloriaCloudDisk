@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package verify;
+option go_package = "./verify";
+
+message SendEmailCodeReq {
+  string email = 1;
+}
+
+message SendEmailCodeResp {
+  bool ok = 1;
+}
+
+service Verify {
+  rpc sendEmailCode(SendEmailCodeReq) returns (SendEmailCodeResp);
+}

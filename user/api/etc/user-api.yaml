@@ -11,3 +11,6 @@ User:
 Auth:
   AccessSecret: "some-secret-jwt-token"
   AccessExpire: 3600
+
+Redis:
+  Host: 127.0.0.1:6379
