@@ -8,6 +8,15 @@ Create Date: 2022-05-08 12:45:19.586580
 from alembic import op
 import sqlalchemy as sa
 
+import sys
+
+from os.path import abspath, dirname
+sys.path.append(dirname(dirname(abspath(__file__))))
+
+from migrations.versions import create_at_column, update_at_column, deleted_column
+
+
+
 from migrations.helpers.table_helper import table_exists
 
 # revision identifiers, used by Alembic.
@@ -16,24 +25,6 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-
-def create_at_column():
-    return sa.Column(
-        "created_at", sa.TIMESTAMP, nullable=False, server_default=sa.func.now()
-    )
-
-
-def update_at_column():
-    return sa.Column(
-        "updated_at",
-        sa.TIMESTAMP,
-        nullable=False,
-        server_default=sa.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-    )
-
-
-def deleted_column():
-    return sa.Column("deleted", sa.Boolean, nullable=False, server_default="0")
 
 
 def upgrade():

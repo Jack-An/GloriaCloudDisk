@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  user-api:
+    image: user_api:v1
+    hostname: user_api
+    container_name: user_api
+    ports:
+      - "6600:6600"

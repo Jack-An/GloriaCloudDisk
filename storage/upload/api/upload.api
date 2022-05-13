@@ -1,0 +1,31 @@
+
+syntax = "v1"
+
+info (
+	title: "upload-api"
+	desc: "storage upload api"
+	author: "ancongcong"
+	email: "ancongcong@wisdomgarden.com"
+)
+
+type (
+	UploadReq {
+		Name string `json:"name,optional"`
+		Size int64 `json:"size,optional"`
+		Ext string `json:"ext,optional"`
+		Type string `json:"type"`
+		ParentId int64 `json:"parentId"`
+	}
+
+	UploadResp {
+		Key string `json:"key"`
+	}
+)
+
+service upload-api {
+	@handler CreateUpload
+	post /upload/create(UploadReq) returns(UploadResp)
+
+
+
+}
