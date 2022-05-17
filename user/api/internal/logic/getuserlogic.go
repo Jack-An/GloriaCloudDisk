@@ -4,6 +4,7 @@ import (
 	"GloriaCloudDisk/common"
 	"GloriaCloudDisk/user/rpc/user"
 	"context"
+	"fmt"
 	"strconv"
 
 	"GloriaCloudDisk/user/api/internal/svc"
@@ -33,7 +34,7 @@ func (l *GetUserLogic) GetUser(req *types.GetUserReq) (resp *types.GetUserResp, 
 	}
 
 	jwtTokenUserId := l.ctx.Value("userId")
-	if jwtTokenUserId != userId {
+	if fmt.Sprintf("%v", jwtTokenUserId) != req.Id {
 		return nil, common.NewDefaultMgsError(common.PERMISSION_DENIED)
 	}
 

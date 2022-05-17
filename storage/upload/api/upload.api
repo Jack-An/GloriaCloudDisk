@@ -25,7 +25,4 @@ type (
 service upload-api {
 	@handler CreateUpload
 	post /upload/create(UploadReq) returns(UploadResp)
-
-
-
 }
